@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog | WealthCompounder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --emerald-deep:#0F3D2E;
+    --emerald-mid:#1B5E44;
+    --gold:#C6952C;
+    --gold-soft:#E8CE8F;
+    --oxblood:#6E1F27;
+    --paper:#F3EEE1;
+    --paper-dark:#E9E1CC;
+    --ink:#201A12;
+    --ink-soft:#4A4436;
+    --rule:rgba(32,26,18,0.14);
+    --max:1000px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Serif', serif; line-height:1.6;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; color:var(--emerald-deep); margin:0 0 0.3em;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
+
+  header.nav{border-bottom:1px solid var(--rule); background:rgba(243,238,225,0.92); position:sticky; top:0; z-index:20;}
+  .nav-inner{max-width:var(--max); margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-word{font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; color:var(--emerald-deep);}
+  .brand-word em{font-style:italic; font-weight:400; color:var(--oxblood);}
+  .back-link{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); border:1px solid var(--rule); padding:8px 14px; transition:all .2s;}
+  .back-link:hover{border-color:var(--emerald-deep); color:var(--emerald-deep);}
+
+  .page-head{padding:50px 0 30px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--oxblood); font-weight:600; margin-bottom:10px;}
+  .page-head p{color:var(--ink-soft); max-width:60ch;}
+
+  .post-list{border-top:1px solid var(--rule); margin-bottom:70px;}
+  .post-card{
+    display:grid; grid-template-columns:120px 1fr; gap:26px;
+    padding:30px 0; border-bottom:1px solid var(--rule);
+    text-decoration:none; color:inherit;
+  }
+  .post-card:hover h3{color:var(--oxblood);}
+  .post-date{font-family:'IBM Plex Mono', monospace; font-size:0.75rem; color:var(--ink-soft); padding-top:4px;}
+  .post-card h3{font-size:1.25rem; transition:color .2s;}
+  .post-card p{color:var(--ink-soft); font-size:0.94rem; margin-top:6px; max-width:62ch;}
+  .post-tag{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:0.65rem; letter-spacing:0.06em;
+    text-transform:uppercase; color:var(--oxblood); border:1px solid var(--oxblood); padding:3px 9px;
+    margin-top:10px; border-radius:2px;
+  }
+
+  @media (max-width:600px){
+    .post-card{grid-template-columns:1fr; gap:6px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <svg width="26" height="26" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="19" fill="none" stroke="#0F3D2E" stroke-width="1.4"/>
+        <rect x="12" y="24" width="16" height="3" fill="#C6952C"/>
+        <rect x="13.5" y="20.5" width="13" height="3" fill="#C6952C"/>
+        <rect x="15" y="17" width="10" height="3" fill="#C6952C"/>
+        <path d="M20 17 C20 10, 26 9, 27 5 C24 8, 20 8, 20 13" fill="#1B5E44"/>
+        <path d="M20 17 C20 10, 14 9, 13 5 C16 8, 20 8, 20 13" fill="#1B5E44"/>
+      </svg>
+      <span class="brand-word">Wealth<em>Compounder</em></span>
+    </a>
+    <a href="index.html" class="back-link">← Back to Site</a>
+  </div>
+</header>
+
+<div class="wrap page-head">
+  <div class="eyebrow">Insights</div>
+  <h1>The WealthCompounder Journal</h1>
+  <p>Notes on investing discipline, compounding, and building a portfolio with clear eyes — written for people who'd rather understand their money than guess about it.</p>
+</div>
+
+<div class="wrap">
+  <div class="post-list">
+
+    <!-- ================================================================
+         TO ADD A NEW POST: copy one <a class="post-card"> block below,
+         edit the date / title / summary / tag, and point href to your
+         new article file inside the /articles folder.
+         Newest posts should go at the TOP of this list.
+         ================================================================ -->
+
+    <a class="post-card" href="articles/why-starting-early-matters.html">
+      <div class="post-date mono">12 Aug 2026</div>
+      <div>
+        <h3>Why Starting Early Matters More Than Timing the Market</h3>
+        <p>A look at how the earliest years of a SIP do more compounding work than any single well-timed decision later on.</p>
+        <span class="post-tag">SIP &amp; Compounding</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+</body>
+</html>
