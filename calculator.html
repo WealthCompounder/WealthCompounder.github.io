@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator | WealthCompounder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --emerald-deep:#0F3D2E;
+    --emerald-mid:#1B5E44;
+    --emerald-pale:#DCE7DC;
+    --gold:#C6952C;
+    --gold-soft:#E8CE8F;
+    --oxblood:#6E1F27;
+    --paper:#F3EEE1;
+    --paper-dark:#E9E1CC;
+    --ink:#201A12;
+    --ink-soft:#4A4436;
+    --rule:rgba(32,26,18,0.14);
+    --max:1000px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'IBM Plex Serif', serif; line-height:1.6;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; color:var(--emerald-deep); margin:0 0 0.3em;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
+
+  header.nav{border-bottom:1px solid var(--rule); background:rgba(243,238,225,0.92); position:sticky; top:0; z-index:20;}
+  .nav-inner{max-width:var(--max); margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-word{font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; color:var(--emerald-deep);}
+  .brand-word em{font-style:italic; font-weight:400; color:var(--oxblood);}
+  .back-link{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); border:1px solid var(--rule); padding:8px 14px; transition:all .2s;}
+  .back-link:hover{border-color:var(--emerald-deep); color:var(--emerald-deep);}
+
+  .page-head{padding:50px 0 30px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--oxblood); font-weight:600; margin-bottom:10px;}
+  .page-head p{color:var(--ink-soft); max-width:60ch;}
+
+  .tabs{display:flex; gap:0; border-bottom:1px solid var(--rule); margin-bottom:34px;}
+  .tab-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em;
+    background:none; border:none; padding:14px 22px; cursor:pointer; color:var(--ink-soft);
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .tab-btn.active{color:var(--emerald-deep); border-bottom-color:var(--gold);}
+
+  .calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:44px; padding-bottom:70px;}
+  .panel{background:var(--paper); }
+  .field{margin-bottom:20px;}
+  .field label{display:block; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:6px;}
+  .field input{
+    width:100%; padding:12px 14px; border:1px solid var(--rule); background:var(--paper-dark);
+    font-family:'IBM Plex Mono', monospace; font-size:1rem; color:var(--ink);
+  }
+  .field input:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .field .hint{font-size:0.72rem; color:var(--ink-soft); margin-top:4px; font-family:'IBM Plex Mono',monospace;}
+
+  .results{
+    background:var(--emerald-deep); color:var(--paper); padding:34px 30px;
+    position:sticky; top:90px; align-self:start;
+  }
+  .results h3{color:var(--paper); font-size:1.1rem; margin-bottom:20px;}
+  .result-row{display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(243,238,225,0.18); font-family:'IBM Plex Mono',monospace; font-size:0.85rem;}
+  .result-row span:first-child{color:rgba(243,238,225,0.7);}
+  .result-row.total{font-size:1.3rem; border-bottom:none; padding-top:18px; color:var(--gold-soft); font-weight:600;}
+  .result-row.total span:first-child{color:rgba(243,238,225,0.85); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; align-self:center;}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.05em; text-transform:uppercase;
+    padding:14px 20px; border:none; cursor:pointer; margin-top:22px; transition:transform .15s;
+  }
+  .btn-gold{background:var(--gold); color:var(--ink);}
+  .btn-gold:hover{transform:translateY(-2px);}
+  .btn-gold:disabled{opacity:0.5; cursor:not-allowed; transform:none;}
+
+  .disclaimer{
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--ink-soft);
+    border-top:1px solid var(--rule); padding:24px 0 60px; line-height:1.8;
+  }
+
+  @media (max-width:760px){
+    .calc-grid{grid-template-columns:1fr;}
+    .results{position:static;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <svg width="26" height="26" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="19" fill="none" stroke="#0F3D2E" stroke-width="1.4"/>
+        <rect x="12" y="24" width="16" height="3" fill="#C6952C"/>
+        <rect x="13.5" y="20.5" width="13" height="3" fill="#C6952C"/>
+        <rect x="15" y="17" width="10" height="3" fill="#C6952C"/>
+        <path d="M20 17 C20 10, 26 9, 27 5 C24 8, 20 8, 20 13" fill="#1B5E44"/>
+        <path d="M20 17 C20 10, 14 9, 13 5 C16 8, 20 8, 20 13" fill="#1B5E44"/>
+      </svg>
+      <span class="brand-word">Wealth<em>Compounder</em></span>
+    </a>
+    <a href="index.html" class="back-link">← Back to Site</a>
+  </div>
+</header>
+
+<div class="wrap page-head">
+  <div class="eyebrow">Illustrative Tool</div>
+  <h1>SIP · Lumpsum · SWP Calculator</h1>
+  <p>Model a monthly SIP, a one-time lumpsum, or a systematic withdrawal plan, then generate a client-ready PDF summary. All figures are illustrative projections based on an assumed rate of return — not a promise or guarantee of actual returns.</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="sip">SIP</button>
+    <button class="tab-btn" data-tab="lumpsum">Lumpsum</button>
+    <button class="tab-btn" data-tab="swp">SWP</button>
+  </div>
+
+  <!-- SIP PANEL -->
+  <div class="calc-grid" id="panel-sip">
+    <div class="panel">
+      <div class="field"><label for="sip-client">Client Name</label><input id="sip-client" type="text" placeholder="e.g. Ramesh Kumar"></div>
+      <div class="field"><label for="sip-amount">Monthly SIP Amount (₹)</label><input id="sip-amount" type="number" value="15000" min="500" step="500"></div>
+      <div class="field"><label for="sip-years">Duration (Years)</label><input id="sip-years" type="number" value="15" min="1" max="40"></div>
+      <div class="field"><label for="sip-rate">Assumed Annual Return (%)</label><input id="sip-rate" type="number" value="12" min="1" max="30" step="0.5">
+        <div class="hint">Illustrative only — actual returns will vary.</div>
+      </div>
+    </div>
+    <div class="results">
+      <h3>Projection</h3>
+      <div class="result-row"><span>Total Invested</span><span id="sip-invested" class="mono">—</span></div>
+      <div class="result-row"><span>Est. Wealth Gain</span><span id="sip-gain" class="mono">—</span></div>
+      <div class="result-row total"><span>Projected Corpus*</span><span id="sip-total" class="mono">—</span></div>
+      <button class="btn btn-gold" onclick="generatePDF('sip')">Generate PDF</button>
+    </div>
+  </div>
+
+  <!-- LUMPSUM PANEL -->
+  <div class="calc-grid" id="panel-lumpsum" style="display:none;">
+    <div class="panel">
+      <div class="field"><label for="ls-client">Client Name</label><input id="ls-client" type="text" placeholder="e.g. Ramesh Kumar"></div>
+      <div class="field"><label for="ls-amount">Lumpsum Amount (₹)</label><input id="ls-amount" type="number" value="500000" min="1000" step="1000"></div>
+      <div class="field"><label for="ls-years">Duration (Years)</label><input id="ls-years" type="number" value="10" min="1" max="40"></div>
+      <div class="field"><label for="ls-rate">Assumed Annual Return (%)</label><input id="ls-rate" type="number" value="12" min="1" max="30" step="0.5">
+        <div class="hint">Illustrative only — actual returns will vary.</div>
+      </div>
+    </div>
+    <div class="results">
+      <h3>Projection</h3>
+      <div class="result-row"><span>Principal</span><span id="ls-invested" class="mono">—</span></div>
+      <div class="result-row"><span>Est. Wealth Gain</span><span id="ls-gain" class="mono">—</span></div>
+      <div class="result-row total"><span>Projected Value*</span><span id="ls-total" class="mono">—</span></div>
+      <button class="btn btn-gold" onclick="generatePDF('lumpsum')">Generate PDF</button>
+    </div>
+  </div>
+
+  <!-- SWP PANEL -->
+  <div class="calc-grid" id="panel-swp" style="display:none;">
+    <div class="panel">
+      <div class="field"><label for="swp-client">Client Name</label><input id="swp-client" type="text" placeholder="e.g. Ramesh Kumar"></div>
+      <div class="field"><label for="swp-corpus">Starting Corpus (₹)</label><input id="swp-corpus" type="number" value="5000000" min="1000" step="1000"></div>
+      <div class="field"><label for="swp-withdraw">Monthly Withdrawal (₹)</label><input id="swp-withdraw" type="number" value="30000" min="500" step="500"></div>
+      <div class="field"><label for="swp-years">Duration (Years)</label><input id="swp-years" type="number" value="20" min="1" max="40"></div>
+      <div class="field"><label for="swp-rate">Assumed Annual Return (%)</label><input id="swp-rate" type="number" value="9" min="1" max="30" step="0.5">
+        <div class="hint">Illustrative only — actual returns will vary. Ignores sequence-of-returns risk.</div>
+      </div>
+    </div>
+    <div class="results">
+      <h3>Projection</h3>
+      <div class="result-row"><span>Total Withdrawn</span><span id="swp-withdrawn" class="mono">—</span></div>
+      <div class="result-row"><span>Ending Balance*</span><span id="swp-ending" class="mono">—</span></div>
+      <div class="result-row total"><span>Est. Monthly Income</span><span id="swp-income" class="mono">—</span></div>
+      <button class="btn btn-gold" id="swp-pdf-btn" onclick="generatePDF('swp')">Generate PDF</button>
+    </div>
+  </div>
+
+  <p class="disclaimer">
+    *Mutual fund investments are subject to market risk. Read all scheme-related documents carefully. WealthCompounder (ARN-365253) is a mutual fund distribution practice and does not provide investment advice. All figures above are illustrative projections based on an assumed constant rate of return and do not account for market volatility, expense ratios, exit loads, or taxation. They are not a guarantee or promise of actual returns. SWP projections in particular do not model sequence-of-returns risk — actual outcomes may differ materially, especially if a market downturn occurs early in the withdrawal period.
+  </p>
+</div>
+
+<script>
+function fmt(n){
+  n = Math.round(n);
+  return '₹' + n.toLocaleString('en-IN');
+}
+
+// ---- SIP ----
+function calcSIP(){
+  const P = parseFloat(document.getElementById('sip-amount').value) || 0;
+  const years = parseFloat(document.getElementById('sip-years').value) || 0;
+  const annualRate = parseFloat(document.getElementById('sip-rate').value) || 0;
+  const n = years * 12;
+  const r = annualRate / 100 / 12;
+  const invested = P * n;
+  let total;
+  if (r === 0) { total = invested; }
+  else { total = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r); }
+  const gain = total - invested;
+  document.getElementById('sip-invested').textContent = fmt(invested);
+  document.getElementById('sip-gain').textContent = fmt(gain);
+  document.getElementById('sip-total').textContent = fmt(total);
+  return {invested, gain, total, P, years, annualRate};
+}
+
+// ---- LUMPSUM ----
+function calcLumpsum(){
+  const P = parseFloat(document.getElementById('ls-amount').value) || 0;
+  const years = parseFloat(document.getElementById('ls-years').value) || 0;
+  const annualRate = parseFloat(document.getElementById('ls-rate').value) || 0;
+  const total = P * Math.pow(1 + annualRate / 100, years);
+  const gain = total - P;
+  document.getElementById('ls-invested').textContent = fmt(P);
+  document.getElementById('ls-gain').textContent = fmt(gain);
+  document.getElementById('ls-total').textContent = fmt(total);
+  return {invested: P, gain, total, P, years, annualRate};
+}
+
+// ---- SWP ----
+function calcSWP(){
+  const corpus0 = parseFloat(document.getElementById('swp-corpus').value) || 0;
+  const withdraw = parseFloat(document.getElementById('swp-withdraw').value) || 0;
+  const years = parseFloat(document.getElementById('swp-years').value) || 0;
+  const annualRate = parseFloat(document.getElementById('swp-rate').value) || 0;
+  const n = years * 12;
+  const r = annualRate / 100 / 12;
+  let balance = corpus0;
+  let totalWithdrawn = 0;
+  let depletedAt = null;
+  for (let i = 1; i <= n; i++){
+    balance = balance * (1 + r);
+    if (balance >= withdraw){
+      balance -= withdraw;
+      totalWithdrawn += withdraw;
+    } else {
+      totalWithdrawn += Math.max(balance, 0);
+      balance = 0;
+      if (depletedAt === null) depletedAt = i;
+    }
+  }
+  document.getElementById('swp-withdrawn').textContent = fmt(totalWithdrawn);
+  document.getElementById('swp-ending').textContent = depletedAt ? 'Depleted (mo. ' + depletedAt + ')' : fmt(balance);
+  document.getElementById('swp-income').textContent = fmt(withdraw) + '/mo';
+  const btn = document.getElementById('swp-pdf-btn');
+  return {corpus0, withdraw, years, annualRate, totalWithdrawn, balance, depletedAt};
+}
+
+function recalcAll(){ calcSIP(); calcLumpsum(); calcSWP(); }
+document.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalcAll));
+recalcAll();
+
+// ---- TABS ----
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    ['sip','lumpsum','swp'].forEach(t => {
+      document.getElementById('panel-' + t).style.display = (t === btn.dataset.tab) ? 'grid' : 'none';
+    });
+  });
+});
+
+// ---- PDF GENERATION ----
+function buildReportHTML(kind){
+  const today = new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+  let client, rows, title, footnote;
+
+  if (kind === 'sip'){
+    const d = calcSIP();
+    client = document.getElementById('sip-client').value || 'Prospective Investor';
+    title = 'SIP Projection Summary';
+    rows = [
+      ['Monthly SIP Amount', fmt(d.P)],
+      ['Investment Duration', d.years + ' years'],
+      ['Assumed Annual Return', d.annualRate + '%'],
+      ['Total Amount Invested', fmt(d.invested)],
+      ['Estimated Wealth Gain', fmt(d.gain)],
+      ['Projected Corpus', fmt(d.total)]
+    ];
+    footnote = 'This SIP illustration assumes a constant annual rate of return compounded monthly. Actual returns will vary based on market performance.';
+  } else if (kind === 'lumpsum'){
+    const d = calcLumpsum();
+    client = document.getElementById('ls-client').value || 'Prospective Investor';
+    title = 'Lumpsum Projection Summary';
+    rows = [
+      ['Lumpsum Amount', fmt(d.P)],
+      ['Investment Duration', d.years + ' years'],
+      ['Assumed Annual Return', d.annualRate + '%'],
+      ['Principal', fmt(d.invested)],
+      ['Estimated Wealth Gain', fmt(d.gain)],
+      ['Projected Value', fmt(d.total)]
+    ];
+    footnote = 'This lumpsum illustration assumes a constant annual rate of return compounded annually. Actual returns will vary based on market performance.';
+  } else {
+    const d = calcSWP();
+    client = document.getElementById('swp-client').value || 'Prospective Investor';
+    title = 'SWP Projection Summary';
+    rows = [
+      ['Starting Corpus', fmt(d.corpus0)],
+      ['Monthly Withdrawal', fmt(d.withdraw)],
+      ['Plan Duration', d.years + ' years'],
+      ['Assumed Annual Return', d.annualRate + '%'],
+      ['Total Withdrawn', fmt(d.totalWithdrawn)],
+      ['Ending Balance', d.depletedAt ? ('Corpus depleted in month ' + d.depletedAt) : fmt(d.balance)]
+    ];
+    footnote = 'This SWP illustration assumes a constant annual rate of return and does not model sequence-of-returns risk. A market downturn early in the withdrawal period can materially reduce how long a corpus lasts, even at the same average rate of return.';
+  }
+
+  const rowsHTML = rows.map(r => `
+    <tr>
+      <td style="padding:12px 0; border-bottom:1px solid #e5ddc7; font-family:'IBM Plex Mono',monospace; font-size:13px; color:#4A4436; text-transform:uppercase; letter-spacing:0.04em;">${r[0]}</td>
+      <td style="padding:12px 0; border-bottom:1px solid #e5ddc7; font-family:'IBM Plex Mono',monospace; font-size:15px; color:#0F3D2E; font-weight:600; text-align:right;">${r[1]}</td>
+    </tr>`).join('');
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${title} — ${client}</title>
+<style>
+  @page { margin: 28mm 20mm; }
+  body{ font-family: Georgia, 'Times New Roman', serif; color:#201A12; background:#F3EEE1; margin:0; padding:40px; }
+  .sheet{ max-width:700px; margin:0 auto; background:#F3EEE1; }
+  .header{ display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #0F3D2E; padding-bottom:16px; margin-bottom:28px; }
+  .brand{ font-size:22px; font-weight:bold; color:#0F3D2E; }
+  .brand em{ font-style:italic; color:#6E1F27; }
+  .meta{ text-align:right; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#4A4436; }
+  h1{ font-size:20px; color:#0F3D2E; margin:0 0 4px; }
+  .sub{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E1F27; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:24px; }
+  table{ width:100%; border-collapse:collapse; margin-bottom:30px; }
+  .footnote{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#4A4436; line-height:1.7; border-top:1px solid #e5ddc7; padding-top:16px; }
+  .footer{ margin-top:40px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#4A4436; display:flex; justify-content:space-between; border-top:1px solid #0F3D2E; padding-top:12px; }
+  .print-btn{ margin:20px auto 0; display:block; padding:10px 20px; background:#0F3D2E; color:#F3EEE1; border:none; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; font-size:12px; letter-spacing:0.05em; cursor:pointer; }
+  @media print { .print-btn{ display:none; } body{ padding:0; } }
+</style></head>
+<body>
+  <div class="sheet">
+    <div class="header">
+      <div class="brand">Wealth<em>Compounder</em></div>
+      <div class="meta">Date: ${today}<br>ARN-365253</div>
+    </div>
+    <h1>${title}</h1>
+    <div class="sub">Prepared for: ${client}</div>
+    <table>${rowsHTML}</table>
+    <div class="footnote">${footnote}<br><br>Mutual fund investments are subject to market risk. Read all scheme-related documents carefully. WealthCompounder (ARN-365253) is a mutual fund distribution practice and does not provide investment advice. This illustration is not a guarantee or promise of actual returns.</div>
+    <div class="footer">
+      <span>Karthika Manivasakam · ARN-365253 · NISM-V-A</span>
+      <span>smanoece@gmail.com · +91 98940 47608</span>
+    </div>
+  </div>
+  <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+</body></html>`;
+}
+
+function generatePDF(kind){
+  const html = buildReportHTML(kind);
+  const w = window.open('', '_blank');
+  if (w && w.document){
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  } else {
+    // Popup blocked — fall back to downloading the HTML report
+    const blob = new Blob([html], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'WealthCompounder-' + kind + '-report.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    alert('Pop-ups are blocked in this browser, so the report downloaded as an HTML file instead. Open it and use your browser\'s Print → Save as PDF option.');
+  }
+}
+</script>
+
+</body>
+</html>

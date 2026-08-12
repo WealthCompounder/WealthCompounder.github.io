@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WealthCompounder | Harnessing the Magic of Compounding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --emerald-deep:#0F3D2E;
+    --emerald-mid:#1B5E44;
+    --emerald-pale:#DCE7DC;
+    --gold:#C6952C;
+    --gold-soft:#E8CE8F;
+    --oxblood:#6E1F27;
+    --paper:#F3EEE1;
+    --paper-dark:#E9E1CC;
+    --ink:#201A12;
+    --ink-soft:#4A4436;
+    --rule:rgba(32,26,18,0.14);
+    --max:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Serif', serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ledger ruled paper texture */
+  .ruled{
+    background-image:
+      repeating-linear-gradient(to bottom, transparent, transparent 35px, var(--rule) 35px, var(--rule) 36px);
+  }
+  h1,h2,h3,h4{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0 0 0.4em 0;
+    color:var(--emerald-deep);
+    letter-spacing:-0.01em;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--oxblood);
+    font-weight:600;
+  }
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 28px;}
+  section{position:relative;}
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:3px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  /* ===== NAV ===== */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(243,238,225,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--rule);
+  }
+  .nav-inner{
+    max-width:var(--max); margin:0 auto; padding:14px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+  .brand-mark{width:34px; height:34px;}
+  .brand-word{font-family:'Fraunces', serif; font-weight:600; font-size:1.18rem; color:var(--emerald-deep);}
+  .brand-word em{font-style:italic; font-weight:400; color:var(--oxblood);}
+  nav.links{display:flex; gap:26px; align-items:center;}
+  nav.links a{
+    text-decoration:none; font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ink-soft); padding:4px 0; border-bottom:1px solid transparent;
+    transition:border-color .2s, color .2s;
+  }
+  nav.links a:hover{color:var(--emerald-deep); border-color:var(--gold);}
+  .nav-cta{
+    background:var(--emerald-deep); color:var(--paper) !important;
+    padding:9px 18px !important; border-radius:2px;
+    text-transform:uppercase; font-size:0.72rem !important; letter-spacing:0.08em;
+  }
+  .nav-cta:hover{background:var(--oxblood) !important; border-color:transparent !important;}
+  .menu-btn{display:none; background:none; border:none; cursor:pointer; padding:6px;}
+  .menu-btn span{display:block; width:22px; height:2px; background:var(--emerald-deep); margin:4px 0;}
+
+  /* ===== HERO ===== */
+  .hero{
+    padding:86px 0 60px;
+    background:
+      radial-gradient(circle at 85% 20%, rgba(198,149,44,0.14), transparent 55%),
+      var(--paper);
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;
+  }
+  .hero .eyebrow{margin-bottom:16px; display:flex; align-items:center; gap:10px;}
+  .hero .eyebrow::before{content:''; width:26px; height:1px; background:var(--oxblood); display:inline-block;}
+  .hero h1{
+    font-size:clamp(2.3rem, 4.2vw, 3.4rem);
+    line-height:1.08;
+    font-weight:600;
+  }
+  .hero h1 .accent{
+    font-style:italic; font-weight:400; color:var(--oxblood);
+  }
+  .hero p.lede{
+    font-size:1.08rem; color:var(--ink-soft); max-width:46ch; margin-top:18px;
+  }
+  .hero-ctas{display:flex; gap:14px; margin-top:32px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.05em;
+    text-transform:uppercase; text-decoration:none; padding:14px 24px;
+    border-radius:2px; transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn-primary{background:var(--emerald-deep); color:var(--paper);}
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(15,61,46,0.28);}
+  .btn-ghost{background:transparent; color:var(--emerald-deep); border:1px solid var(--emerald-deep);}
+  .btn-ghost:hover{background:var(--emerald-deep); color:var(--paper); transform:translateY(-2px);}
+
+  .hero-badges{display:flex; gap:22px; margin-top:40px; flex-wrap:wrap;}
+  .hero-badge{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--ink-soft);}
+  .hero-badge b{display:block; color:var(--emerald-deep); font-size:0.78rem; margin-bottom:2px;}
+
+  /* signature visual: coin stack -> sapling on a ledger */
+  .signature{
+    position:relative; aspect-ratio:1/1; max-width:420px; margin:0 auto;
+    border:1px solid var(--rule); background:var(--paper-dark);
+  }
+  .signature svg{width:100%; height:100%; display:block;}
+  .signature-caption{
+    position:absolute; bottom:10px; left:10px; right:10px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.62rem; color:var(--ink-soft);
+    display:flex; justify-content:space-between; letter-spacing:0.04em;
+  }
+
+  .sapling-leaf{transform-origin:bottom center;}
+  .grow-anim .sapling-trunk{stroke-dasharray:120; stroke-dashoffset:120; animation:draw 1.6s ease forwards .2s;}
+  .grow-anim .sapling-leaf{opacity:0; animation:leafin .7s ease forwards;}
+  .grow-anim .leaf-1{animation-delay:1.1s;}
+  .grow-anim .leaf-2{animation-delay:1.3s;}
+  .grow-anim .leaf-3{animation-delay:1.5s;}
+  .grow-anim .leaf-4{animation-delay:1.7s;}
+  .grow-anim .coin{opacity:0; animation:coinin .5s ease forwards;}
+  .grow-anim .coin1{animation-delay:0s;} .grow-anim .coin2{animation-delay:.12s;}
+  .grow-anim .coin3{animation-delay:.24s;} .grow-anim .coin4{animation-delay:.36s;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  @keyframes leafin{from{opacity:0; transform:scale(0.4) translateY(6px);} to{opacity:1; transform:scale(1) translateY(0);}}
+  @keyframes coinin{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ===== TRUST BAR ===== */
+  .trustbar{
+    background:var(--emerald-deep); color:var(--paper); padding:20px 0;
+  }
+  .trust-inner{
+    display:flex; flex-wrap:wrap; gap:28px; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.05em;
+  }
+  .trust-inner span{opacity:0.92;}
+  .trust-inner b{color:var(--gold-soft); font-weight:600;}
+
+  /* ===== SECTION generic ===== */
+  .section{padding:88px 0;}
+  .section-head{max-width:640px; margin-bottom:48px;}
+  .section-head h2{font-size:clamp(1.7rem,2.6vw,2.3rem);}
+  .divider{
+    height:1px; background:var(--rule); max-width:var(--max); margin:0 auto;
+  }
+
+  /* ===== ABOUT ===== */
+  .about{background:var(--paper-dark);}
+  .about-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px; align-items:start;}
+  .stamp{
+    width:132px; height:132px; border-radius:50%;
+    border:2px solid var(--oxblood); display:flex; align-items:center; justify-content:center;
+    text-align:center; transform:rotate(-8deg); margin-bottom:26px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.6rem; letter-spacing:0.07em;
+    color:var(--oxblood); padding:10px; text-transform:uppercase;
+  }
+  .stamp b{display:block; font-size:0.82rem; font-family:'Fraunces',serif; font-style:italic; color:var(--oxblood); margin:4px 0;}
+  .about-card{
+    background:var(--paper); border:1px solid var(--rule); padding:32px;
+  }
+  .about-card .name{font-size:1.5rem;}
+  .about-card .role{font-family:'IBM Plex Mono',monospace; font-size:0.75rem; color:var(--oxblood); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:18px; display:block;}
+  .cred-row{display:flex; gap:26px; margin-top:24px; flex-wrap:wrap; border-top:1px solid var(--rule); padding-top:20px;}
+  .cred-row div{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--ink-soft);}
+  .cred-row b{display:block; color:var(--emerald-deep); font-size:0.86rem; font-family:'IBM Plex Mono', monospace;}
+
+  /* ===== COMPOUND STRIP ===== */
+  .compound-strip{background:var(--emerald-deep); color:var(--paper); padding:76px 0;}
+  .compound-strip .section-head h2{color:var(--paper);}
+  .compound-strip .section-head p{color:rgba(243,238,225,0.78);}
+  .cs-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(243,238,225,0.18);}
+  .cs-card{background:var(--emerald-deep); padding:30px 26px;}
+  .cs-card .num{font-family:'IBM Plex Mono', monospace; color:var(--gold-soft); font-size:0.75rem; letter-spacing:0.08em;}
+  .cs-card h4{color:var(--paper); font-size:1.15rem; margin-top:10px;}
+  .cs-card p{color:rgba(243,238,225,0.75); font-size:0.92rem; margin-top:8px;}
+
+  /* ===== SERVICES ===== */
+  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--rule); border:1px solid var(--rule);}
+  .service-card{background:var(--paper); padding:34px 28px; transition:background .2s;}
+  .service-card:hover{background:var(--paper-dark);}
+  .service-card .eyebrow{margin-bottom:10px;}
+  .service-card h3{font-size:1.2rem;}
+  .service-card p{font-size:0.92rem; color:var(--ink-soft); margin-top:10px;}
+
+  /* ===== TOOLS / CALCULATOR CTA ===== */
+  .tools{background:var(--paper-dark);}
+  .tools-panel{
+    display:grid; grid-template-columns:1fr 1fr; gap:0;
+    border:1px solid var(--rule); background:var(--paper);
+  }
+  .tools-copy{padding:44px 40px;}
+  .tools-visual{
+    background:
+      repeating-linear-gradient(to bottom, transparent, transparent 26px, var(--rule) 26px, var(--rule) 27px),
+      var(--paper-dark);
+    padding:44px 40px; display:flex; flex-direction:column; justify-content:center;
+    border-left:1px solid var(--rule);
+  }
+  .tools-visual .row{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:0.78rem; padding:7px 0; color:var(--ink-soft);}
+  .tools-visual .row b{color:var(--emerald-deep);}
+  .tools-visual .row.total{border-top:1px solid var(--rule); margin-top:6px; padding-top:14px; color:var(--emerald-deep); font-weight:600;}
+
+  /* ===== PROCESS ===== */
+  .process-list{border-top:1px solid var(--rule);}
+  .process-item{
+    display:grid; grid-template-columns:90px 1fr; gap:24px;
+    padding:26px 0; border-bottom:1px solid var(--rule);
+  }
+  .process-item .mono{color:var(--oxblood); font-size:0.78rem; padding-top:4px;}
+  .process-item h4{font-size:1.08rem; margin-bottom:6px;}
+  .process-item p{color:var(--ink-soft); font-size:0.94rem; max-width:60ch;}
+
+  /* ===== COMPLIANCE NOTE ===== */
+  .compliance{
+    background:var(--paper-dark); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding:40px 0;
+  }
+  .compliance .wrap{display:flex; gap:22px; align-items:flex-start;}
+  .compliance-icon{
+    width:40px; height:40px; border:1px solid var(--oxblood); border-radius:50%;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; color:var(--oxblood); font-weight:600;
+  }
+  .compliance p{font-size:0.86rem; color:var(--ink-soft); max-width:78ch;}
+
+  /* ===== CONTACT ===== */
+  .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:56px;}
+  .contact-list{margin-top:22px;}
+  .contact-row{
+    display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--rule);
+    font-family:'IBM Plex Mono', monospace; font-size:0.85rem;
+  }
+  .contact-row span:first-child{color:var(--ink-soft); text-transform:uppercase; font-size:0.7rem; letter-spacing:0.06em; padding-top:3px;}
+  .contact-row a{text-decoration:none; color:var(--emerald-deep);}
+  .contact-row a:hover{color:var(--oxblood);}
+  .contact-form{background:var(--paper-dark); border:1px solid var(--rule); padding:34px;}
+  .contact-form label{display:block; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:6px;}
+  .contact-form input, .contact-form textarea{
+    width:100%; padding:12px 14px; margin-bottom:18px; border:1px solid var(--rule);
+    background:var(--paper); font-family:'IBM Plex Serif', serif; font-size:0.95rem; color:var(--ink);
+  }
+  .contact-form textarea{min-height:100px; resize:vertical;}
+  .contact-form button{width:100%; border:none; cursor:pointer;}
+
+  /* ===== FOOTER ===== */
+  footer{background:var(--emerald-deep); color:rgba(243,238,225,0.82); padding:52px 0 26px;}
+  .footer-top{display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; padding-bottom:32px; border-bottom:1px solid rgba(243,238,225,0.18);}
+  .footer-brand{display:flex; align-items:center; gap:10px;}
+  .footer-brand .brand-word{color:var(--paper);}
+  .footer-links{display:flex; gap:34px; flex-wrap:wrap;}
+  .footer-links a{text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.05em; color:rgba(243,238,225,0.82);}
+  .footer-links a:hover{color:var(--gold-soft);}
+  .footer-disclaimer{
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; line-height:1.8;
+    color:rgba(243,238,225,0.55); margin-top:26px; max-width:900px;
+  }
+  .footer-bottom{
+    display:flex; justify-content:space-between; margin-top:22px; flex-wrap:wrap; gap:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:rgba(243,238,225,0.55);
+  }
+
+  @media (max-width:860px){
+    nav.links{display:none;}
+    .menu-btn{display:block;}
+    .hero-grid, .about-grid, .contact-grid, .tools-panel{grid-template-columns:1fr;}
+    .cs-grid, .services-grid{grid-template-columns:1fr;}
+    .signature{margin-top:36px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="19" fill="none" stroke="#0F3D2E" stroke-width="1.4"/>
+        <rect x="12" y="24" width="16" height="3" fill="#C6952C"/>
+        <rect x="13.5" y="20.5" width="13" height="3" fill="#C6952C"/>
+        <rect x="15" y="17" width="10" height="3" fill="#C6952C"/>
+        <path d="M20 17 C20 10, 26 9, 27 5 C24 8, 20 8, 20 13" fill="#1B5E44"/>
+        <path d="M20 17 C20 10, 14 9, 13 5 C16 8, 20 8, 20 13" fill="#1B5E44"/>
+      </svg>
+      <span class="brand-word">Wealth<em>Compounder</em></span>
+    </a>
+    <nav class="links">
+      <a href="#about">About</a>
+      <a href="#compounding">Why Compounding</a>
+      <a href="#services">Services</a>
+      <a href="#tools">Tools</a>
+      <a href="#process">Process</a>
+      <a href="#contact" class="nav-cta">Book a Meeting</a>
+    </nav>
+    <button class="menu-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">AMFI Registered Mutual Fund Distribution</div>
+      <h1>Harnessing the <span class="accent">magic</span> of compounding, one ledger entry at a time.</h1>
+      <p class="lede">WealthCompounder helps individuals and families build disciplined, goal-linked mutual fund portfolios under ARN-365253 — with clear documentation and clearer conversations.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-primary">Start a Conversation</a>
+        <a href="https://wa.me/919894047608" class="btn btn-ghost">WhatsApp Us</a>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge"><b>ARN-365253</b>Registered Distributor</div>
+        <div class="hero-badge"><b>NISM-V-A</b>Certified</div>
+        <div class="hero-badge"><b>AMFI</b>Registered Distributor</div>
+      </div>
+    </div>
+    <div class="signature grow-anim" aria-hidden="true">
+      <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- ledger lines -->
+        <g stroke="#201A12" opacity="0.08">
+          <line x1="0" y1="60" x2="320" y2="60" stroke="#201A12"/>
+          <line x1="0" y1="100" x2="320" y2="100" stroke="#201A12"/>
+          <line x1="0" y1="140" x2="320" y2="140" stroke="#201A12"/>
+          <line x1="0" y1="180" x2="320" y2="180" stroke="#201A12"/>
+          <line x1="0" y1="220" x2="320" y2="220" stroke="#201A12"/>
+        </g>
+        <!-- trunk -->
+        <line class="sapling-trunk" x1="160" y1="230" x2="160" y2="150" stroke="#1B5E44" stroke-width="5" stroke-linecap="round"/>
+        <!-- leaves -->
+        <ellipse class="sapling-leaf leaf-1" cx="140" cy="150" rx="20" ry="12" fill="#1B5E44" transform="rotate(-30 140 150)"/>
+        <ellipse class="sapling-leaf leaf-2" cx="180" cy="150" rx="20" ry="12" fill="#1B5E44" transform="rotate(30 180 150)"/>
+        <ellipse class="sapling-leaf leaf-3" cx="160" cy="128" rx="16" ry="24" fill="#2E7A57"/>
+        <ellipse class="sapling-leaf leaf-4" cx="160" cy="105" rx="11" ry="16" fill="#C6952C"/>
+        <!-- coin stack -->
+        <ellipse class="coin coin1" cx="160" cy="235" rx="34" ry="9" fill="#C6952C" stroke="#8a6a1c" stroke-width="1"/>
+        <ellipse class="coin coin2" cx="160" cy="248" rx="38" ry="10" fill="#E8CE8F" stroke="#8a6a1c" stroke-width="1"/>
+        <ellipse class="coin coin3" cx="160" cy="261" rx="42" ry="11" fill="#C6952C" stroke="#8a6a1c" stroke-width="1"/>
+        <ellipse class="coin coin4" cx="160" cy="274" rx="46" ry="12" fill="#E8CE8F" stroke="#8a6a1c" stroke-width="1"/>
+      </svg>
+      <div class="signature-caption">
+        <span>FIG. 01 — GROWTH LEDGER</span>
+        <span>SIP · SWP · GOAL PLANS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="trustbar">
+  <div class="wrap trust-inner">
+    <span><b>ARN-365253</b> — Karthika Manivasakam</span>
+    <span><b>NISM-Series-V-A</b> — Mutual Fund Distributors Certification</span>
+    <span><b>AMFI Registered</b> — Mutual Fund Distributor</span>
+  </div>
+</div>
+
+<section class="section about" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <div class="stamp">AMFI<b>Registered</b>Distributor</div>
+      <div class="eyebrow">Who We Are</div>
+      <h2>A distribution practice built on plain documentation and patient compounding.</h2>
+      <p style="color:var(--ink-soft); margin-top:14px;">WealthCompounder is not an advisory desk — we're a mutual fund distribution practice. Our job is to make it simple and transparent for you to invest through well-established schemes, with your ARN-registered distributor handling the documentation correctly the first time.</p>
+    </div>
+    <div class="about-card">
+      <span class="name mono" style="font-family:'Fraunces',serif; font-style:italic;">Karthika Manivasakam</span>
+      <span class="role">Mutual Fund Distributor</span>
+      <p style="color:var(--ink-soft); font-size:0.95rem;">Karthika is an AMFI-registered mutual fund distributor. WealthCompounder handles onboarding, KYC, SIP/SWP setup, and ongoing servicing — helping clients invest with clarity rather than guesswork.</p>
+      <div class="cred-row">
+        <div><b>ARN-365253</b>Distributor Registration</div>
+        <div><b>NISM-V-A</b>Certification</div>
+        <div><b>AMFI</b>Registered Distributor</div>
+      </div>
+      <div class="cred-row" style="border-top:none; padding-top:0; margin-top:14px;">
+        <div><b>smanoece@gmail.com</b>Email</div>
+        <div><b>+91 98940 47608</b>Phone / WhatsApp</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="compound-strip" id="compounding">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--gold-soft);">Why Compounding</div>
+      <h2>Time in the market does the heavy lifting — we just keep the ledger honest.</h2>
+      <p>Compounding rewards consistency and patience far more than it rewards timing. Three habits matter more than any single fund choice.</p>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="cs-grid">
+      <div class="cs-card">
+        <div class="num mono">START EARLY</div>
+        <h4>Every year of delay is a year of growth you can't buy back</h4>
+        <p>The earliest contributions have the longest runway to compound — starting sooner matters more than starting big.</p>
+      </div>
+      <div class="cs-card">
+        <div class="num mono">STAY CONSISTENT</div>
+        <h4>SIPs turn market noise into a routine</h4>
+        <p>Regular, disciplined investing smooths out volatility over time rather than trying to predict it.</p>
+      </div>
+      <div class="cs-card">
+        <div class="num mono">STAY INVESTED</div>
+        <h4>Withdrawals need a plan, not a reaction</h4>
+        <p>How and when you draw down a corpus matters as much as how you built it — especially in the early years of withdrawal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">How We Help</div>
+      <h2>Distribution services for every stage of your investing journey</h2>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="eyebrow">SIP</div>
+        <h3>Systematic Investment Plans</h3>
+        <p>Set up and manage disciplined monthly investing across schemes suited to your goals and time horizon.</p>
+      </div>
+      <div class="service-card">
+        <div class="eyebrow">Lumpsum</div>
+        <h3>One-Time Investments</h3>
+        <p>Deploy a lumpsum with proper documentation, folio setup, and ongoing statement access.</p>
+      </div>
+      <div class="service-card">
+        <div class="eyebrow">SWP</div>
+        <h3>Systematic Withdrawal Plans</h3>
+        <p>Structure a regular income stream from an existing corpus, with attention to withdrawal-rate sensitivity.</p>
+      </div>
+      <div class="service-card">
+        <div class="eyebrow">Goal Planning</div>
+        <h3>Goal-Based Projections</h3>
+        <p>Map contributions to specific goals — education, a home, retirement — using illustrative projection tools.</p>
+      </div>
+      <div class="service-card">
+        <div class="eyebrow">Onboarding</div>
+        <h3>KYC &amp; Folio Setup</h3>
+        <p>End-to-end documentation for KYC and folio setup, done correctly and explained in plain language.</p>
+      </div>
+      <div class="service-card">
+        <div class="eyebrow">Servicing</div>
+        <h3>Ongoing Portfolio Support</h3>
+        <p>Statements, folio updates, nomination changes, and year-round support for existing investments.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section tools" id="tools">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Tools</div>
+      <h2>See the numbers before you commit</h2>
+    </div>
+    <div class="tools-panel">
+      <div class="tools-copy">
+        <h3 style="font-size:1.3rem;">SIP · Lumpsum · SWP Calculator</h3>
+        <p style="color:var(--ink-soft); margin-top:12px;">Run illustrative projections for a monthly SIP, a one-time lumpsum, or a withdrawal plan — and generate a client-ready PDF summary in seconds. Figures are illustrative only and not a promise of returns.</p>
+        <a href="calculator.html" class="btn btn-primary" style="margin-top:22px;">Open the Calculator</a>
+      </div>
+      <div class="tools-visual">
+        <div class="row"><span>Monthly SIP</span><b>₹15,000</b></div>
+        <div class="row"><span>Duration</span><b>15 years</b></div>
+        <div class="row"><span>Assumed rate</span><b>Illustrative</b></div>
+        <div class="row total"><span>Projected corpus*</span><b>See report</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="process">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">What To Expect</div>
+      <h2>A first conversation, not a sales pitch</h2>
+    </div>
+    <div class="process-list">
+      <div class="process-item">
+        <div class="mono">01</div>
+        <div><h4>A short discovery call</h4><p>We talk through your goals, timeline, and current investments — no forms yet, just context.</p></div>
+      </div>
+      <div class="process-item">
+        <div class="mono">02</div>
+        <div><h4>Illustrative projections</h4><p>We put together SIP, lumpsum, or SWP illustrations so you can see the shape of different approaches.</p></div>
+      </div>
+      <div class="process-item">
+        <div class="mono">03</div>
+        <div><h4>Documentation, handled properly</h4><p>KYC and folio setup explained step by step, with copies of everything for your records.</p></div>
+      </div>
+      <div class="process-item">
+        <div class="mono">04</div>
+        <div><h4>Ongoing servicing</h4><p>Statements, review conversations, and support whenever your folios or goals need attention.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="compliance">
+  <div class="wrap">
+    <div class="compliance-icon">i</div>
+    <p><strong>Mutual fund investments are subject to market risk. Read all scheme-related documents carefully.</strong> WealthCompounder is a mutual fund distribution practice (ARN-365253) and does not provide investment advice. Past performance is not indicative of future returns. Any projections shown are illustrative and not a guarantee of actual performance.</p>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <div class="eyebrow">Get In Touch</div>
+      <h2>Let's start with a conversation</h2>
+      <p style="color:var(--ink-soft); margin-top:12px;">Reach out directly, or send a note and we'll respond within a day.</p>
+      <div class="contact-list">
+        <div class="contact-row"><span>Email</span><a href="mailto:smanoece@gmail.com">smanoece@gmail.com</a></div>
+        <div class="contact-row"><span>Phone</span><a href="tel:+919894047608">+91 98940 47608</a></div>
+        <div class="contact-row"><span>WhatsApp</span><a href="https://wa.me/919894047608">+91 98940 47608</a></div>
+        <div class="contact-row"><span>ARN</span><span>ARN-365253</span></div>
+      </div>
+    </div>
+    <form class="contact-form" onsubmit="event.preventDefault(); window.location.href='mailto:smanoece@gmail.com?subject=Enquiry from WealthCompounder website&body=' + encodeURIComponent('Name: ' + this.name.value + '\nPhone: ' + this.phone.value + '\nMessage: ' + this.message.value);">
+      <label for="name">Name</label>
+      <input id="name" name="name" type="text" required>
+      <label for="phone">Phone</label>
+      <input id="phone" name="phone" type="tel" required>
+      <label for="message">What are you looking to do?</label>
+      <textarea id="message" name="message" placeholder="e.g. Start a monthly SIP for my child's education"></textarea>
+      <button type="submit" class="btn btn-primary">Send Enquiry</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <svg width="30" height="30" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="19" fill="none" stroke="#F3EEE1" stroke-width="1.4"/>
+          <rect x="12" y="24" width="16" height="3" fill="#C6952C"/>
+          <rect x="13.5" y="20.5" width="13" height="3" fill="#C6952C"/>
+          <rect x="15" y="17" width="10" height="3" fill="#C6952C"/>
+          <path d="M20 17 C20 10, 26 9, 27 5 C24 8, 20 8, 20 13" fill="#DCE7DC"/>
+          <path d="M20 17 C20 10, 14 9, 13 5 C16 8, 20 8, 20 13" fill="#DCE7DC"/>
+        </svg>
+        <span class="brand-word">Wealth<em style="color:var(--gold-soft); font-style:italic; font-weight:400;">Compounder</em></span>
+      </div>
+      <div class="footer-links">
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#tools">Tools</a>
+        <a href="#process">Process</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+    <p class="footer-disclaimer">
+      WealthCompounder is the operating name used by Karthika Manivasakam (ARN-365253, NISM-Series-V-A certified), an AMFI-registered mutual fund distributor. This website is for informational purposes only and does not constitute investment advice or a recommendation to buy or sell any scheme. Mutual fund investments are subject to market risks; please read the scheme information and other related documents carefully before investing. Illustrations and projections shown are indicative and based on assumed rates of return — actual returns may vary and are not guaranteed.
+    </p>
+    <div class="footer-bottom">
+      <span>© 2026 WealthCompounder. All rights reserved.</span>
+      <span>ARN-365253 · AMFI Registered Distributor</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
